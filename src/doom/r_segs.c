@@ -29,19 +29,6 @@
 #include "r_sky.h"
 #include "g_game.h"
 
-// [JN] Brightmaps
-boolean brightmaps_are_set = false;
-int brightmap_redonly_doom1;
-int brightmap_redonly_doom2;
-int brightmap_greenonly1_doom2;
-int brightmap_redonly;
-int brightmap_notgrayorbrown;
-int brightmap_notgray;
-int brightmap_greenonly1;
-int brightmap_greenonly2;
-int brightmap_greenonly3;
-int brightmap_orangeyellow;
-
 
 // OPTIMIZE: closed two sided lines as single sided
 
@@ -519,107 +506,6 @@ fixed_t R_ScaleFromGlobalAngle (angle_t visangle)
 }
 
 
-void R_InitBrightmaps (void)
-{
-    // Doom 1 only
-    brightmap_redonly_doom1 = (gamemission == doom && segtextured == R_TextureNumForName("SW2STON2"));
-    
-    // Doom 2 only
-    brightmap_redonly_doom2 = (gamemission != doom && (segtextured == R_TextureNumForName("SW1BRN1")
-    || segtextured == R_TextureNumForName("SW1STARG")
-    || segtextured == R_TextureNumForName("SW1STON2")
-    || segtextured == R_TextureNumForName("SW2MARB")));
-    
-    brightmap_greenonly1_doom2 = (gamemission != doom && (segtextured == R_TextureNumForName("SW2STON2")
-    || segtextured == R_TextureNumForName("SW2STARG")));
-    
-    // All games
-    brightmap_redonly = (segtextured == R_TextureNumForName("SW1BRCOM")
-    || segtextured == R_TextureNumForName("SW1DIRT")
-    || segtextured == R_TextureNumForName("SW1STRTN")
-    || segtextured == R_TextureNumForName("SW2COMP")
-    || segtextured == R_TextureNumForName("SW2PANEL")
-    || segtextured == R_TextureNumForName("SW2SLAD")
-    || segtextured == R_TextureNumForName("SW2WOOD")
-    || segtextured == R_TextureNumForName("WOOD4")
-    || segtextured == R_TextureNumForName("WOODSKUL")
-    || segtextured == R_TextureNumForName("SLADSKUL")
-    || segtextured == R_TextureNumForName("SW1BRIK")
-    || segtextured == R_TextureNumForName("SW1COMM")
-    || segtextured == R_TextureNumForName("SW1MET2")
-    || segtextured == R_TextureNumForName("SW1STON1")
-    || segtextured == R_TextureNumForName("SW1STONE")
-    || segtextured == R_TextureNumForName("SW2BLUE")
-    || segtextured == R_TextureNumForName("SW2GSTON")
-    || segtextured == R_TextureNumForName("SW2ROCK")
-    || segtextured == R_TextureNumForName("SW2STON6")
-    || segtextured == R_TextureNumForName("SW2ZIM")
-    || segtextured == R_TextureNumForName("WOODGARG")
-    || segtextured == R_TextureNumForName("PNK4EXIT")
-    || segtextured == R_TextureNumForName("LITERED2"));
-    
-    brightmap_notgray = (segtextured == R_TextureNumForName("COMPSTA2")
-    || segtextured == R_TextureNumForName("EXITSIGN")
-    || segtextured == R_TextureNumForName("PLANET1")
-    || segtextured == R_TextureNumForName("SW2EXIT")
-    || segtextured == R_TextureNumForName("SW2GRAY1")
-    || segtextured == R_TextureNumForName("COMPSTA1")
-    || segtextured == R_TextureNumForName("EXITSTON")
-    || segtextured == R_TextureNumForName("SILVER2")
-    || segtextured == R_TextureNumForName("LITEBLU1")
-    || segtextured == R_TextureNumForName("SW2GRAY")
-    || segtextured == R_TextureNumForName("LITEBLU2"));
-    
-    brightmap_notgrayorbrown = (segtextured == R_TextureNumForName("COMP2")
-    || segtextured == R_TextureNumForName("COMPUTE2")
-    || segtextured == R_TextureNumForName("SILVER3")
-    || segtextured == R_TextureNumForName("COMPUTE1")
-    || segtextured == R_TextureNumForName("COMPUTE3")
-    || segtextured == R_TextureNumForName("SW2MOD1")
-    || segtextured == R_TextureNumForName("BTNTMETL")
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD2"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD3"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD4"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD5"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD6"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD7"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD8"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD9"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD10"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD11"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLAD12"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLADRIP1"))
-    || (gamemission != doom && segtextured == R_TextureNumForName("SLADRIP3"))
-    || segtextured == R_TextureNumForName("BTNTSLVR"));
-    
-    brightmap_greenonly1 = (segtextured == R_TextureNumForName("SW2BRN1")
-    || segtextured == R_TextureNumForName("SW2BRCOM")
-    || segtextured == R_TextureNumForName("SW2STON1")
-    || segtextured == R_TextureNumForName("SW2STONE")
-    || segtextured == R_TextureNumForName("SW2TEK")
-    || segtextured == R_TextureNumForName("SW2BRIK")
-    || segtextured == R_TextureNumForName("SW2BRN2")
-    || segtextured == R_TextureNumForName("SW2COMM")
-    || segtextured == R_TextureNumForName("SW2DIRT")
-    || segtextured == R_TextureNumForName("SW2MET2")
-    || segtextured == R_TextureNumForName("SW2STRTN")
-    || segtextured == R_TextureNumForName("SW2VINE")
-    || segtextured == R_TextureNumForName("PIPEWAL1")
-    || segtextured == R_TextureNumForName("TEKLITE2"));
-    
-    brightmap_greenonly2 = (segtextured == R_TextureNumForName("M_TEC")
-    || segtextured == R_TextureNumForName("SW2BRNGN"));
-    
-    brightmap_greenonly3 = (segtextured == R_TextureNumForName("SW2METAL"));
-    
-    brightmap_orangeyellow = (segtextured == R_TextureNumForName("LITEYEL2")
-    || segtextured == R_TextureNumForName("LITEYEL3")
-    || segtextured == R_TextureNumForName("YELMETAL"));
-
-    // [JN] Setting is done. Do not run this cycle again.
-    brightmaps_are_set = true;
-}
-
 //
 // R_StoreWallRange
 // A wall segment will be drawn
@@ -880,11 +766,6 @@ void R_StoreWallRange (int start, int stop)
     // calculate rw_offset (only needed for textured lines)
     segtextured = midtexture | toptexture | bottomtexture | maskedtexture;
 
-    // TODO: how should I really call R_InitBrightmaps once and set all brightmaps?
-    // if (!brightmaps_are_set)
-    if (brightmaps && !vanillaparm && gamevariant != freedoom && gamevariant != freedm)
-    R_InitBrightmaps();
-    
     if (segtextured)
     {
         offsetangle = rw_normalangle-rw_angle1;
@@ -915,82 +796,11 @@ void R_StoreWallRange (int start, int stop)
         lightnum++;
 
         if (lightnum < 0)
-        {
-            if (brightmap_redonly)
-            walllights = fullbright_redonly[0];
-            else if (brightmap_redonly_doom1)
-            walllights = fullbright_redonly_doom1[0];
-            else if (brightmap_redonly_doom2)
-            walllights = fullbright_redonly_doom2[0];
-            else if (brightmap_notgray)
-            walllights = fullbright_notgray[0];
-            else if (brightmap_notgrayorbrown)
-            walllights = fullbright_notgrayorbrown[0];
-            else if (brightmap_greenonly1)
-            walllights = fullbright_greenonly1[0];
-            else if (brightmap_greenonly2)
-            walllights = fullbright_greenonly2[0];
-            else if (brightmap_greenonly3)
-            walllights = fullbright_greenonly3[0];
-            else if (brightmap_greenonly1_doom2)
-            walllights = fullbright_greenonly1_doom2[0];
-            else if (brightmap_orangeyellow)
-            walllights = fullbright_orangeyellow[0];
-            else // [JN] Standard light table
             walllights = scalelight[0];
-        }
-        // --------------------------------------------------------------------------------
         else if (lightnum >= LIGHTLEVELS)
-        {
-            if (brightmap_redonly)
-            walllights = fullbright_redonly[LIGHTLEVELS-1];
-            else if (brightmap_redonly_doom1)
-            walllights = fullbright_redonly_doom1[LIGHTLEVELS-1];
-            else if (brightmap_redonly_doom2)
-            walllights = fullbright_redonly_doom2[LIGHTLEVELS-1];
-            else if (brightmap_notgray)
-            walllights = fullbright_notgray[LIGHTLEVELS-1];
-            else if (brightmap_notgrayorbrown)
-            walllights = fullbright_notgrayorbrown[LIGHTLEVELS-1];
-            else if (brightmap_greenonly1)
-            walllights = fullbright_greenonly1[LIGHTLEVELS-1];
-            else if (brightmap_greenonly2)
-            walllights = fullbright_greenonly2[LIGHTLEVELS-1];
-            else if (brightmap_greenonly3)
-            walllights = fullbright_greenonly3[LIGHTLEVELS-1];
-            else if (brightmap_greenonly1_doom2)
-            walllights = fullbright_greenonly1_doom2[LIGHTLEVELS-1];
-            else if (brightmap_orangeyellow)
-            walllights = fullbright_orangeyellow[LIGHTLEVELS-1];
-            else // [JN] Standard light table 
             walllights = scalelight[LIGHTLEVELS-1];
-        }
-        // --------------------------------------------------------------------------------
         else
-        {
-            if (brightmap_redonly)
-            walllights = fullbright_redonly[lightnum];
-            else if (brightmap_redonly_doom1)
-            walllights = fullbright_redonly_doom1[lightnum];
-            else if (brightmap_redonly_doom2)
-            walllights = fullbright_redonly_doom2[lightnum];
-            else if (brightmap_notgray)
-            walllights = fullbright_notgray[lightnum];
-            else if (brightmap_notgrayorbrown)
-            walllights = fullbright_notgrayorbrown[lightnum];
-            else if (brightmap_greenonly1)
-            walllights = fullbright_greenonly1[lightnum];
-            else if (brightmap_greenonly2)
-            walllights = fullbright_greenonly2[lightnum];
-            else if (brightmap_greenonly3)
-            walllights = fullbright_greenonly3[lightnum];
-            else if (brightmap_greenonly1_doom2)
-            walllights = fullbright_greenonly1_doom2[lightnum];
-            else if (brightmap_orangeyellow)
-            walllights = fullbright_orangeyellow[lightnum];
-            else // [JN] Standard light table 
             walllights = scalelight[lightnum];
-        }
     }
     }
 

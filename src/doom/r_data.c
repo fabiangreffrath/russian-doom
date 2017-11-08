@@ -157,6 +157,7 @@ short**			texturecolumnlump;
 unsigned**	texturecolumnofs;  // [crispy] fix Medusa bug
 unsigned**	texturecolumnofs2; // [crispy] original column offsets for single-patched textures
 byte**			texturecomposite;
+lighttable_t **	texturebrightmap;
 
 // for global animation
 int*		flattranslation;
@@ -572,6 +573,108 @@ static void GenerateTextureHashTable(void)
     }
 }
 
+typedef struct
+{
+	GameMission_t only_for;
+	GameMission_t not_for;
+	const char *texture;
+	lighttable_t *brightmap;
+} brightmapdef_t;
+
+static const brightmapdef_t brightmapdefs[] =
+{
+	{doom,	none,	"SW2STON2",	fullbright_redonly_doom1},
+
+	{none,	doom,	"SW1BRN1",	fullbright_redonly_doom2},
+	{none,	doom,	"SW1STARG",	fullbright_redonly_doom2},
+	{none,	doom,	"SW1STON2",	fullbright_redonly_doom2},
+	{none,	doom,	"SW2MARB",	fullbright_redonly_doom2},
+
+	{none,	doom,	"SW2STON2",	fullbright_greenonly1_doom2},
+	{none,	doom,	"SW2STARG",	fullbright_greenonly1_doom2},
+
+	{none,	none,	"SW1BRCOM",	fullbright_redonly},
+	{none,	none,	"SW1DIRT",	fullbright_redonly},
+	{none,	none,	"SW1STRTN",	fullbright_redonly},
+	{none,	none,	"SW2COMP",	fullbright_redonly},
+	{none,	none,	"SW2PANEL",	fullbright_redonly},
+	{none,	none,	"SW2SLAD",	fullbright_redonly},
+	{none,	none,	"SW2WOOD",	fullbright_redonly},
+	{none,	none,	"WOOD4",	fullbright_redonly},
+	{none,	none,	"WOODSKUL",	fullbright_redonly},
+	{none,	none,	"SLADSKUL",	fullbright_redonly},
+	{none,	none,	"SW1BRIK",	fullbright_redonly},
+	{none,	none,	"SW1COMM",	fullbright_redonly},
+	{none,	none,	"SW1MET2",	fullbright_redonly},
+	{none,	none,	"SW1STON1",	fullbright_redonly},
+	{none,	none,	"SW1STONE",	fullbright_redonly},
+	{none,	none,	"SW2BLUE",	fullbright_redonly},
+	{none,	none,	"SW2GSTON",	fullbright_redonly},
+	{none,	none,	"SW2ROCK",	fullbright_redonly},
+	{none,	none,	"SW2STON6",	fullbright_redonly},
+	{none,	none,	"SW2ZIM",	fullbright_redonly},
+	{none,	none,	"WOODGARG",	fullbright_redonly},
+	{none,	none,	"PNK4EXIT",	fullbright_redonly},
+	{none,	none,	"LITERED2",	fullbright_redonly},
+
+	{none,	none,	"COMPSTA2",	fullbright_notgray},
+	{none,	none,	"EXITSIGN",	fullbright_notgray},
+	{none,	none,	"PLANET1",	fullbright_notgray},
+	{none,	none,	"SW2EXIT",	fullbright_notgray},
+	{none,	none,	"SW2GRAY1",	fullbright_notgray},
+	{none,	none,	"COMPSTA1",	fullbright_notgray},
+	{none,	none,	"EXITSTON",	fullbright_notgray},
+	{none,	none,	"SILVER2",	fullbright_notgray},
+	{none,	none,	"LITEBLU1",	fullbright_notgray},
+	{none,	none,	"SW2GRAY",	fullbright_notgray},
+	{none,	none,	"LITEBLU2",	fullbright_notgray},
+
+	{none,	none,	"COMP2",	fullbright_notgrayorbrown},
+	{none,	none,	"COMPUTE2",	fullbright_notgrayorbrown},
+	{none,	none,	"SILVER3",	fullbright_notgrayorbrown},
+	{none,	none,	"COMPUTE1",	fullbright_notgrayorbrown},
+	{none,	none,	"COMPUTE3",	fullbright_notgrayorbrown},
+	{none,	none,	"SW2MOD1",	fullbright_notgrayorbrown},
+	{none,	none,	"BTNTMETL",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD2",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD3",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD4",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD5",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD6",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD7",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD8",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD9",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD10",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD11",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLAD12",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLADRIP1",	fullbright_notgrayorbrown},
+	{none,	doom,	"SLADRIP3",	fullbright_notgrayorbrown},
+	{none,	none,	"BTNTSLVR",	fullbright_notgrayorbrown},
+
+	{none,	none,	"SW2BRN1",	fullbright_greenonly1},
+	{none,	none,	"SW2BRCOM",	fullbright_greenonly1},
+	{none,	none,	"SW2STON1",	fullbright_greenonly1},
+	{none,	none,	"SW2STONE",	fullbright_greenonly1},
+	{none,	none,	"SW2TEK",	fullbright_greenonly1},
+	{none,	none,	"SW2BRIK",	fullbright_greenonly1},
+	{none,	none,	"SW2BRN2",	fullbright_greenonly1},
+	{none,	none,	"SW2COMM",	fullbright_greenonly1},
+	{none,	none,	"SW2DIRT",	fullbright_greenonly1},
+	{none,	none,	"SW2MET2",	fullbright_greenonly1},
+	{none,	none,	"SW2STRTN",	fullbright_greenonly1},
+	{none,	none,	"SW2VINE",	fullbright_greenonly1},
+	{none,	none,	"PIPEWAL1",	fullbright_greenonly1},
+	{none,	none,	"TEKLITE2",	fullbright_greenonly1},
+
+	{none,	none,	"M_TEC",	fullbright_greenonly2},
+	{none,	none,	"SW2BRNGN",	fullbright_greenonly2},
+
+	{none,	none,	"SW2METAL",	fullbright_greenonly3},
+
+	{none,	none,	"LITEYEL2",	fullbright_orangeyellow},
+	{none,	none,	"LITEYEL3",	fullbright_orangeyellow},
+	{none,	none,	"YELMETAL",	fullbright_orangeyellow},
+};
 
 //
 // R_InitTextures
@@ -612,6 +715,7 @@ void R_InitTextures (void)
     int			temp2;
     int			temp3;
 
+    extern int		brightmaps;
     
     // Load the patch names from pnames.lmp.
     name[8] = 0;
@@ -657,6 +761,7 @@ void R_InitTextures (void)
     texturecompositesize = Z_Malloc (numtextures * sizeof(*texturecompositesize), PU_STATIC, 0);
     texturewidthmask = Z_Malloc (numtextures * sizeof(*texturewidthmask), PU_STATIC, 0);
     textureheight = Z_Malloc (numtextures * sizeof(*textureheight), PU_STATIC, 0);
+    texturebrightmap = Z_Malloc (numtextures * sizeof(*texturebrightmap), PU_STATIC, 0);
 
     totalwidth = 0;
     
@@ -738,6 +843,32 @@ void R_InitTextures (void)
 	textureheight[i] = texture->height<<FRACBITS;
 		
 	totalwidth += texture->width;
+    }
+
+    if (brightmaps && !vanillaparm && gamevariant != freedoom && gamevariant != freedm)
+    {
+	for (i = 0; i < numtextures; i++)
+	{
+		texture_t *texture = textures[i];
+		texturebrightmap[i] = NULL;
+
+		for (j = 0; j < arrlen(brightmapdefs); j++)
+		{
+			const brightmapdef_t *current = &brightmapdefs[j];
+
+			if ((current->only_for != none && gamemission != current->only_for) ||
+			    (current->not_for != none && gamemission == current->not_for))
+			{
+				continue;
+			}
+
+			if (!strcasecmp(texture->name, current->texture))
+			{
+				texturebrightmap[i] = current->brightmap;
+				break;
+			}
+		}
+	}
     }
 
     Z_Free(patchlookup);
